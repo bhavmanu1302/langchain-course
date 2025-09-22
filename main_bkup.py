@@ -33,13 +33,7 @@ agent_executor = AgentExecutor.from_agent_and_tools(
     agent=agent, tools=tools, verbose=True
 )
 
-extract_output = RunnableLambda(
-    lambda x: output_parser.parse(x) if "error" not in x["output"] else x
-)
-
-parse_output = RunnableLambda(lambda x: output_parser.parse(x))
-
-chain = agent_executor | extract_output | parse_output
+chain = agent_executor
 
 
 def main():
@@ -51,14 +45,14 @@ def main():
     )
     print(result)
 
-    # if "error" in result:
-    #     print("Error:", result["error"])
-    # else:
-    #     print("Input:", output_parser.parse(result["input"]))
-    #     print("Answer:", output_parser.parse(result["output"]).answer)
-    #     print("Sources:")
-    #     for source in output_parser.parse(result["output"]).sources:
-    #         print("-", source.url)
+    if "error" in result:
+        print("Error:", result["error"])
+    else:
+        print("Input:", output_parser.parse(result["input"]))
+        print("Answer:", output_parser.parse(result["output"]).answer)
+        print("Sources:")
+        for source in output_parser.parse(result["output"]).sources:
+            print("-", source.url)
 
 
 if __name__ == "__main__":
